@@ -719,7 +719,7 @@ class OpenContextBase(object):
             else:
                 sleep(0.1)
             # send req loop per 10 seconds
-            cur_time = datetime.now().timestamp()
+            cur_time = time.time()
             if (self._check_last_req_time is None) or (cur_time - self._check_last_req_time > 10):
                 self._check_last_req_time = cur_time
                 if self._thread_check_sync_sock is thread_handle:
