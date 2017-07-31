@@ -92,7 +92,6 @@ def _example_rt_ticker(quote_ctx):
         print("%s TICKER" % stk_code)
         print(ret_data)
         print("\n\n")
-        print(type(ret_data['volume']))
 
 
 def _example_order_book(quote_ctx):
@@ -236,70 +235,6 @@ def _example_global_state(quote_ctx):
     print("get global state")
     print(ret_data)
 
-
-class StockQuoteTest(StockQuoteHandlerBase):
-    def on_recv_rsp(self, rsp_str):
-        ret_code, content = super(StockQuoteTest, self).on_recv_rsp(rsp_str)
-        if ret_code != RET_OK:
-            print("StockQuoteTest: error, msg: %s" % content)
-            return RET_ERROR, content
-        print("StockQuoteTest ", content)
-        return RET_OK, content
-
-
-class OrderBookTest(OrderBookHandlerBase):
-    def on_recv_rsp(self, rsp_str):
-        ret_code, content = super(OrderBookTest, self).on_recv_rsp(rsp_str)
-        if ret_code != RET_OK:
-            print("OrderBookTest: error, msg: %s" % content)
-            return RET_ERROR, content
-        print("OrderBookTest", content)
-        return RET_OK, content
-
-
-class CurKlineTest(CurKlineHandlerBase):
-    def on_recv_rsp(self, rsp_str):
-        ret_code, content = super(CurKlineTest, self).on_recv_rsp(rsp_str)
-        if ret_code != RET_OK:
-            print("CurKlineTest: error, msg: %s" % content)
-            return RET_ERROR, content
-        print("CurKlineTest", content)
-        return RET_OK, content
-
-
-class TickerTest(TickerHandlerBase):
-    def on_recv_rsp(self, rsp_str):
-        ret_code, content = super(TickerTest, self).on_recv_rsp(rsp_str)
-        if ret_code != RET_OK:
-            print("TickerTest: error, msg: %s" % content)
-            return RET_ERROR, content
-        print("TickerTest", content)
-        return RET_OK, content
-
-
-class RTDataTest(RTDataHandlerBase):
-    def on_recv_rsp(self, rsp_str):
-        ret_code, content = super(RTDataTest, self).on_recv_rsp(rsp_str)
-        if ret_code != RET_OK:
-            print("RTDataTest: error, msg: %s" % content)
-            return RET_ERROR, content
-        print("RTDataTest")
-        print("\n\n")
-        print(type(content['volume']))
-        print(content)
-        return RET_OK, content
-
-
-class BrokerTest(BrokerHandlerBase):
-    def on_recv_rsp(self, rsp_str):
-        ret_code, content = super(BrokerTest, self).on_recv_rsp(rsp_str)
-        if ret_code != RET_OK:
-            print("BrokerTest: error, msg: %s %s " % content)
-            return RET_ERROR, content
-        print("BrokerTest", content[0])
-        print("\n\n")
-        print("BrokerTest", content[1])
-        return RET_OK, content
 
 if __name__ == "__main__":
 

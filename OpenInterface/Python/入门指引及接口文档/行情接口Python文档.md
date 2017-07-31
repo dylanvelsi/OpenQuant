@@ -794,7 +794,23 @@ ret_code, ret_data = quote_ctx.get_stock_quote(code_list)
 **返回**： 
 ret_code失败时，ret_data返回为错误描述字符串； 
 客户端无符合条件数据时，ret_code为成功，返回None 
-正常情况下，ret_data为一个dataframe，其结构和get_market_snapshot一样
+正常情况下，ret_data为一个dataframe，其中包括：
+
+**code** ：股票代码；string
+**data_date**:      日期： str
+**data_time**:      时间：str
+**last_price** ： 	 最新价格；float 
+**open_price**：	 今日开盘价；float 
+**high_price**：	 最高价格；float 
+**low_price**：	     最低价格；float 
+**prev_close_price**：	昨收盘价格；float 
+**volume**：	成交数量； long 
+**turnover**：	成交金额；float 
+**turnover_rate**：	换手率；float 
+**amplitude** :     振幅：int
+**suspension**：	  是否停牌(True表示停牌)；bool 
+**listing_date** ：  上市日期 (yyyy-MM-dd)；string 
+
 
 **失败情况**: 
 1. codelist中股票代码不合法 
