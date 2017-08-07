@@ -21,8 +21,8 @@ from rqalpha.utils.logger import system_log
 from rqalpha.interface import AbstractEventSource
 from rqalpha.events import Event, EVENT
 from rqalpha.utils import RqAttrDict
-
-from datetime import datetime, timedelta, date
+from rqalpha.const import DEFAULT_ACCOUNT_TYPE
+from datetime import timedelta, date, datetime
 from .futu_market_state import *
 
 
@@ -54,12 +54,12 @@ class FUTUEventForBacktest(AbstractEventSource):
     @staticmethod
     def _get_stock_trading_minutes(trading_date):
         trading_minutes = set()
-        current_dt = datetime.datetime.combine(
-            trading_date, datetime.time(9, 31))
+        # current_dt = datetime.combine(trading_date, time(9, 30))
+        current_dt = trading_date.replace(hour=9,minute=30)
         am_end_dt = current_dt.replace(hour=12, minute=00)
         pm_start_dt = current_dt.replace(hour=13, minute=1)
         pm_end_dt = current_dt.replace(hour=16, minute=0)
-        delta_minute = datetime.timedelta(minutes=1)
+        delta_minute = timedelta(minutes=1)
         while current_dt <= am_end_dt:
             trading_minutes.add(current_dt)
             current_dt += delta_minute
@@ -107,7 +107,6 @@ class FUTUEventForBacktest(AbstractEventSource):
                 yield Event(EVENT.AFTER_TRADING, calendar_dt=dt_after_trading, trading_dt=dt_after_trading)
                 yield Event(EVENT.SETTLEMENT, calendar_dt=dt_settlement, trading_dt=dt_settlement)
         elif frequency == '1m':
-            raise NotImplementedError()
             for day in self._env.data_proxy.get_trading_dates(start_date, end_date):
                 before_trading_flag = True
                 date = day.to_pydatetime()
@@ -134,9 +133,8 @@ class FUTUEventForBacktest(AbstractEventSource):
                         if before_trading_flag:
                             before_trading_flag = False
                             yield Event(EVENT.BEFORE_TRADING,
-                                        calendar_dt=calendar_dt -
-                                        datetime.timedelta(minutes=30),
-                                        trading_dt=trading_dt - datetime.timedelta(minutes=30))
+                                        calendar_dt=calendar_dt - timedelta(minutes=30),
+                                        trading_dt=trading_dt - timedelta(minutes=30))
                         if self._universe_changed:
                             self._universe_changed = False
                             last_dt = calendar_dt

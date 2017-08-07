@@ -38,6 +38,7 @@ class FUTUDataSource(AbstractDataSource):
         self._quote_context.subscribe(stock_code=self._env.config.base.benchmark, data_type='K_DAY', push=False)  #订阅，得到cache的时候，订阅，拉历史，得到当前数据，push动态更新,去重
         self._cache = data_cache._cache
         self._today = None
+        self._data_cache=data_cache
 
     def get_all_instruments(self):
         """
@@ -238,9 +239,10 @@ class FUTUDataSource(AbstractDataSource):
         ret_code = 0
         if self._cache['cur_kline'] or instrument.order_book_id not in self._cache['cur_kline'].keys():
             self._quote_context.subscribe(instrument.order_book_id, "K_DAY", push=True)
-            self._quote_context.set_handler(CurKlineTest(self._cache))
+            # self._quote_context.set_handler(CurKlineTest(self._cache))
+            self._quote_context.set_handler(self._data_cache)
             self._quote_context.start()
-            self._cache['cur_kline'] = CurKlineTest(self._cache)._cur_kline
+            # self._cache['cur_kline'] = CurKlineTest(self._cache)._cur_kline
             self._fill_cur_kline_cache_data(instrument)
         else:
             return ret_code, self._cache['cur_kline'][instrument.order_book_id]
@@ -546,7 +548,7 @@ class FUTUDataSource(AbstractDataSource):
         raise NotImplementedError
 
 
-class DataCache:
+class DataCache(CurKlineHandlerBase):
     def __init__(self):
         self._cache = {}
         self._cache["basicinfo_hk"] = None
@@ -564,18 +566,13 @@ class DataCache:
         for key in self._cache:
             self._cache[key] = None
 
-
-class CurKlineTest(CurKlineHandlerBase):
-    def __init__(self, data_cache):
-        self._cur_kline = data_cache['cur_kline']
-
     def on_recv_rsp(self, rsp_str):
-        ret_code, ret_data = super(CurKlineTest, self).on_recv_rsp(rsp_str)
+        ret_code, ret_data = super(DataCache, self).on_recv_rsp(rsp_str)
         if ret_code == RET_ERROR or isinstance(ret_data, str):
             six.print_(_(u"push kline data error:{bar_data}").format(ret_data=ret_data))
         else:
             if ret_data.empty:
-                self._cur_kline = {}
+                self._cache['cur_kline']={}
             else:
                 bar_data = ret_data.iloc[-1:].copy()
                 del bar_data['code'], bar_data['k_type']  # 删除推送数据多出来的字段
@@ -587,9 +584,8 @@ class CurKlineTest(CurKlineHandlerBase):
                                 inplace=True)  # 将字段名称改为一致的
                 bar_data['volume'] = bar_data['volume'].astype('float64')  # 把成交量的数据类型转为float
 
-                self._cur_kline[ret_data['code'][0]] = bar_data
-                return ret_code, self._cur_kline[ret_data['code'][0]]
-
+                self._cache['cur_kline'][ret_data['code'][0]]=bar_data
+                return ret_code, self._cache['cur_kline'][ret_data['code'][0]]
 
 
 
