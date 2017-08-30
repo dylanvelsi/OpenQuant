@@ -618,7 +618,7 @@ ret_code失败时，ret_data返回为错误描述字符串；
 
 ### 获取经纪队列  get_broker_queue
 ```python
-ret_code, ask_data, bid_data = quote_ctx.get_broker_queue(code)
+ret_code, bid_data, ask_data = quote_ctx.get_broker_queue(code)
 ```
 
 
@@ -628,7 +628,7 @@ ret_code, ask_data, bid_data = quote_ctx.get_broker_queue(code)
 **code**: 股票代码, string, 例如，”HK.00700”
 
 **返回**：
-ret_code失败时，ret_data返回为错误描述字符串； 
+ret_code失败时，bid_data返回为错误描述字符串； 
 客户端无符合条件数据时，ret_code为成功，ask_data, bid_data返回None 
 正常情况下，ask_data, bid_data均为dataframe， 
 其中bid_data是买盘的数据，包括： 
@@ -739,6 +739,8 @@ ret_code,ret_data = unsubscribe(stock_code, data_type, unpush=True)
 ret_code失败时，ret_data返回为错误描述字符串； 
 ret_code为成功，ret_data返回None 
 如果指定内容已退订，则直接返回成功 
+
+注意：如果订阅时push=False（默认参数就是False），那么对应的退订的unpush=False
 
 
 **失败情况**:
